@@ -1,0 +1,124 @@
+{% extends "base/title_base.html" %}
+{% block t %}
+    音乐推荐
+{% endblock %}
+{% block title %}
+    {% load static %}
+    <link type="text/css" rel="stylesheet" href="{% static "css/common.css" %}">
+    <link type="text/css" rel="stylesheet" href="{% static "css/ranking.css" %}">
+    <link rel="stylesheet" href="../../static/css/about2.css"/>
+<style>
+ul li span{
+    font-size: 20px;
+    width: 200px;
+    line-height: 48px;
+    padding: 0 20px;
+}
+</style>
+    </head>
+    <body>
+    <div class="header">
+        <a href="/" class="logo" title="首页"
+           style="font-size: 24px;line-height: 24px;padding: 15px 0 0 0">基于深度学习的音乐推荐系统</a>
+
+        <div class="search-box">
+            <form id="searchForm" action="{% url 'search' 1 %}" method="post" target="_blank">
+                {% csrf_token %}
+                <div class="search-keyword">
+                    <input name="kword" type="text" class="keyword" maxlength="120" placeholder="体面"/>
+                </div>
+                <input id="subSerch" type="submit" class="search-button" value="搜 索"/>
+            </form>
+            <div id="suggest" class="search-suggest"></div>
+            <div class="search-hot-words">
+                {% for song in search_song %}
+                    <a target="play" href="{% url 'play' song.song.song_id %}">{{ song.song.song_name }}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </div><!--end header-->
+    <div class="nav-box">
+        <div class="nav-box-inner">
+            <ul class="nav clearfix">
+                <li><a href="/">首页</a></li>
+                <li><a href="{% url 'ranking' %}">音乐推荐</a></li>
+                <li><a href="{% url 'home' 1 %}" target="_blank">用户中心</a></li>
+            </ul>
+        </div>
+    </div><!--end nav-box-->
+    <div class="wrapper clearfix">
+        <!-- 左侧列表 -->
+        <div class="main">
+            <div class="page">
+                <div class="box">
+                    <div class="content">
+                        <h1 align="center" style="margin: 10px;font-size:25px">音乐推荐</h1>
+                        <div class="table clearfix">
+                            <div id="feedbackForm">
+                                <div class="form feedbackform">
+                                    <div class="tip">
+                                        请输入您所喜欢的歌曲名
+                                    </div>
+                                    <div class="row">
+                                        <label class="label">歌曲名</label>
+                                        <input type="text" id="input_text" class="text text-error gray"
+                                               autocomplete="off"
+                                               name="input_text" style="width: 60%"/>
+                                        <span id="err_ctitle" class="msg-error">请输入歌曲名</span>
+                                        <input type="button" value="提交" name="" class="button" id="predict"/>
+                                    </div>
+                                    <div class="row">
+                                        <label class="label">推荐的歌</label>
+                                        <div type="text" name="res_text" id="res_text"
+                                             style="color: rgb(153, 153, 153);border-style:solid; border-width:1px; width: 80%">
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <script>
+                                    var textarea = document.getElementById('res_text');
+                                    textarea.scrollTop = textarea.scrollHeight;
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script src="../../static/js/jquery.min.js"></script>
+    <script>
+        $('#predict').on('click', function () {
+            var name = $('#input_text').val()
+            if (name == '' || name == undefined) {
+                alert("歌曲名不能为空！")
+                return
+            }
+            $.ajax({
+                type: 'POST',
+                url: "/predict",
+                dataType: 'json', //服务端返回json格式的数据
+                data: {'name': name},
+                success: function (data) { // 这里的data就是返回的json格式的数据
+                    console.log('success')
+                    var html = '<ul>'
+                    for (var i = 0; i < data.result_list.length; i++) {
+                        html += `<li><span style="width: 200px">`+ data.result_list[i].name+`</span><audio src="` + data.result_list[i].src + `" controls></audio></li>`
+                    }
+                    html+="</ul>"
+                    console.log(html)
+                    $('#res_text').html(html)
+                },
+                error: function (xhr, type) {
+                    if (xhr.status == 401) {
+                        alert('')
+                    }
+                }
+            });
+        })
+
+    </script>
+{% endblock %}

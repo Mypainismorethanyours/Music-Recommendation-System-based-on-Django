@@ -1,0 +1,20 @@
+运行步骤
+需要先安装Python的相关依赖：pymysql，Django，surprise，simpleui   使用pip install 安装
+
+第一步：创建数据库，数据库名：db_music
+
+第二步：执行SQL语句，打开db_music.sql文件，运行该文件中的SQL语句
+
+第三步：源码文件为music_recommend.zip，修改源代码中的settings.py文件，改成自己的mysql数据库用户名和密码
+
+第四步：运行命令：python manage.py runserver 8000
+
+第五步：打开浏览器查看
+音乐网站前台：http://127.0.0.1:8000
+音乐网站后台：http://127.0.0.1:8000/admin
+
+测试账户
+
+账户1： 用户名：admin 密码：123
+
+
